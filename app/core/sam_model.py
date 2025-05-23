@@ -13,27 +13,15 @@ class SAMInit:
         self.model_path = os.getenv('FASTSAM_MODEL_PATH', config.fastsam_model_path)
         self.model = FastSAM(self.model_path)
         self.device = 0 if torch.cuda.is_available() else 'cpu'
-        self.conf = 0.4
-        self.iou = 0.9
 
-    def model_parameter(self, conf:float, iou:float):
-        """
-        模型推理参数更新
-        :param conf:
-        :param iou:
-        :return:
-        """
-        self.conf = conf
-        self.iou = iou
-
-    def inference_with_point(self, points:[list], image_path):
+    def inference_with_point(self, points:[list], image_path, conf:float, iou:float):
         """
         通过点进行推理
         :param points:
         :param image_path:
         :return:
         """
-        results = self.model(source=image_path, device=self.device, points=points, labels=[1], conf=self.conf, iou=self.iou)
+        results = self.model(source=image_path, device=self.device, points=points, labels=[1], conf=conf, iou=iou)
 
         return self._postprocess_with_point(results=results,image_path=image_path)
 

@@ -21,7 +21,7 @@ class SAMInit:
         :param image_path:
         :return:
         """
-        results = self.model(source=image_path, device=self.device, points=points, labels=[1], conf=conf, iou=iou)
+        results = self.model(source=image_path, device=self.device, points=points, labels=[0], conf=conf, iou=iou)
 
         return self._postprocess_with_point(results=results,image_path=image_path)
 
@@ -44,7 +44,7 @@ class SAMInit:
                     mask_binary = (mask_resized > 0).astype('uint8') * 255
                     masks.append(mask_binary)
 
-        return boxes, masks
+        return [boxes[0]], [masks[0]]
 
 
 if __name__ == "__main__":

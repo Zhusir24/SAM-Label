@@ -1,3 +1,4 @@
+import cv2
 import gradio as gr
 import numpy as np
 from PIL import Image, ImageDraw
@@ -74,7 +75,7 @@ def demo():
                 main_image = gr.Image(
                     label="标注区域",
                     interactive=True,
-                    type="numpy"
+                    type="numpy",
                 )
                 detect_btn = gr.Button("开始检测", variant="primary")
 
@@ -138,7 +139,13 @@ def demo():
 
             try:
                 result = invoke_model.process_image(image_path=image_path, points=pos, conf=conf, iou=iou)
-                return result, True, False, pos, "", result, False  # 重置新点击标记
+                if result.shape[-1] == 3:  # 确保是BGR格式
+                    result_rgb = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+                else:
+                    result_rgb = result.copy()
+                if result_rgb.dtype != np.uint8:
+                    result_rgb = (result_rgb * 255).astype(np.uint8)
+                return result_rgb, True, False, pos, "", result, False  # 重置新点击标记
             except Exception as e:
                 print(f"Detection error: {e}")
                 return last_res if last_res is not None else np.zeros((100, 100, 3),
